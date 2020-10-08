@@ -23,24 +23,34 @@
                 <el-button type="text" @click="registForm()">注册账号>></el-button>
 
                 <!-- 编辑弹出框 -->
-                <el-dialog title="注册账号" :visible.sync="editVisible" width="30%">
-                    <el-form ref="param" :model="registParam" label-width="70px">
-                        <el-form-item label="账号">
+                <el-dialog title="注册账号" :visible.sync="editVisible" width="33%">
+                    <el-form ref="param" :model="registParam" :rules="registRules" label-width="90px">
+                        <el-form-item label="账号" prop="id">
                             <el-input v-model="registParam.id"></el-input>
                         </el-form-item>
-                         <el-form-item label="名称">
-                            <el-input v-model="registParam.name"></el-input>
+                         <el-form-item label="昵称" prop="name">
+                            <el-input v-model="registParam.name" maxlength="8"></el-input>
                         </el-form-item>
-                        <el-form-item label="密码">
-                            <el-input v-model="registParam.password"></el-input>
+                        <el-form-item label="密码" prop="password">
+                            <el-input type="password" v-model="registParam.password"></el-input>
                         </el-form-item>
-                        <el-form-item label="确认密码">
-                            <el-input v-model="registParam.confirmPassword"></el-input>
+                        <el-form-item label="确认密码" prop="confirmPassword">
+                            <el-input type="password" v-model="registParam.confirmPassword"></el-input>
                         </el-form-item>
-                        <el-form-item label="上级单位">
-                            <el-select v-model="registParam.unitID" placeholder="请选择" class="handle-select mr10">
-                                <el-option v-for="(item,index) in unitList" :key="index" :label="item.name" :value="item.id"></el-option>
-                            </el-select>
+                        <el-form-item label="真实姓名" prop="userName">
+                            <el-input v-model="registParam.userName" maxlength="8"></el-input>
+                        </el-form-item>
+                        <el-form-item label="职务" prop="position">
+                            <el-input v-model="registParam.position"></el-input>
+                        </el-form-item>
+                        <el-form-item label="电话" prop="phone">
+                            <el-input v-model="registParam.phone"></el-input>
+                        </el-form-item>
+                        <el-form-item label="邮箱" prop="email">
+                            <el-input v-model="registParam.email"></el-input>
+                        </el-form-item>
+                        <el-form-item label="通讯地址" prop="address">
+                            <el-input v-model="registParam.address"></el-input>
                         </el-form-item>
                         <el-form-item label="备注说明">
                             <el-input type="textarea" rows="5" v-model="registParam.remark"></el-input>
@@ -59,8 +69,8 @@
 <script>
 import request from '../../utils/request';
 import localItem from '../../utils/localstorage';
+import time from '../../utils/time'
 import md5 from 'js-md5';
-import unitApi from '../../api/unit/index';
 
 export default {
     data: function() {
@@ -69,20 +79,59 @@ export default {
                 username: '',
                 password: ''
             },
-            registParam: {
-                id:'',
-                name: '',
-                password: '',
-                confirmPassword:'',
-                unitID:'',
-                remark:''
-            },
-            unitList:[],
+            registParam: {},
             editVisible:false,
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
+            registRules:{
+                id:         [{ required: true, message: '请输入账号', trigger: 'blur' },
+                            {validator: function(rule, value, callback) {
+                                if (
+                                    /^[a-z0-9]{8,}$/i.test(
+                                    value
+                                    ) == false
+                                ) {
+                                    callback(new Error("最少输入8位字符"));
+                                } else {
+                                    callback();
+                                }
+                                },
+                                trigger: "blur"
+                            }],
+                name:       [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+                password:   [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                confirmPassword: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                userName:   [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
+                position:   [{ required: true, message: '请输入职务', trigger: 'blur' }],
+                phone:      [{ required: true, message: '请输入电话', trigger: 'blur' },
+                                {validator: function(rule, value, callback) {
+                                    if (/^1[34578]\d{9}$/.test(value) == false) {
+                                        callback(new Error("手机号格式错误"));
+                                    } else {
+                                        callback();
+                                    }
+                                },
+                                trigger: "blur"
+                            }],
+                email:      [{ required: true, message: '请输入邮箱', trigger: 'blur' },
+                                {validator: function(rule, value, callback) {
+                                    if (
+                                        /^\w{1,64}@[a-z0-9\-]{1,256}(\.[a-z]{2,6}){1,2}$/i.test(
+                                        value
+                                        ) == false
+                                    ) {
+                                        callback(new Error("邮箱格式错误"));
+                                    } else {
+                                        callback();
+                                    }
+                                    },
+                                    trigger: "blur"
+                                }],
+                address:    [{ required: true, message: '请输入地址', trigger: 'blur' }]
+            }
+            
         };
     },
     methods: {
@@ -91,7 +140,7 @@ export default {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     request({
-                        url: './loginIn',
+                        url: './user/loginIn',
                         method: 'post',
                         params: {
                             id : this.param.username,
@@ -119,32 +168,36 @@ export default {
         //打开注册页面方法
         registForm(){
             this.param={};
+            this.registParam={};
             this.editVisible = true;
-            unitApi.fetchAllData().then(res => {
-                this.unitList = res.data;
-            });
         },
         //保存注册编辑
         saveEdit() {
             if(this.registParam.password == this.registParam.confirmPassword){
+                this.registParam.pwd = md5(this.registParam.password);
+                this.registParam.userType = 'common';
+                this.registParam.roleType = 'business';
+                this.registParam.status = '2';
+                this.registParam.roleGroup = '';
+                // this.registParam.createTime = time.getNowTime();
+                // this.registParam.updateTime = time.getNowTime();
+                this.registParam.createTime = new Date();
+                this.registParam.updateTime = new Date();
+
+                delete this.registParam.password;
+                delete this.registParam.confirmPassword;
                 request({
-                    url: './register',
+                    url: './user/register',
                     method: 'post',
-                    data: {
-                        id : this.registParam.id,
-                        name : this.registParam.name,
-                        pwd: md5(this.registParam.password),
-                        remark : this.registParam.remark,
-                        unitID : this.registParam.unitID
-                    }
+                    data: this.registParam
                 }).then(res => {
                     console.log(res)
                     if (res.code === 200) {
                         this.$message.success(res.message);
-                        this.editVisible = false;
                     } else {
                         this.$message.error(res.message);                           
                     }
+                    this.editVisible = false;
                 }).catch(err => {
                     console.log(err);
                 });

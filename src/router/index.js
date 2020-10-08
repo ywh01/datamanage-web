@@ -35,8 +35,8 @@ export default new Router({
                     meta: { title: '数据源管理' }
                 },
                 {
-                    path: '/physicalmodel',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/physicalModel.vue'),
+                    path: '/metaData',
+                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/metaData.vue'),
                     meta: { title: '物理模型' }
                 },
                 {

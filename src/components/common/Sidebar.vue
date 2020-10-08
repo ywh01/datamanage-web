@@ -64,12 +64,8 @@ export default {
                 {
                     icon: 'el-icon-lx-favor',
                     index: '1',
-                    title: '单位用户管理',
+                    title: '用户管理',
                     subs: [
-                        {
-                            index: 'unitmanage',
-                            title: '单位管理'
-                        },
                         {
                             index: 'usermanage',
                             title: '用户管理'
@@ -89,10 +85,15 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-home',
-                    index: 'physicalmodel',
-                    title: '物理模型'
+                    index: 'metaData',
+                    title: '元数据'
                 },
                 {
+                    icon: 'el-icon-lx-cascades',
+                    index: 'table',
+                    title: '封装模板',
+                    subs: [
+                        {
                     icon: 'el-icon-lx-cascades',
                     index: 'table',
                     title: '基础表格'
@@ -181,6 +182,10 @@ export default {
                     index: '/donate',
                     title: '支持作者'
                 }
+                    ]
+                },
+
+                
             ]
         };
     },

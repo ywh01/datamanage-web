@@ -68,15 +68,16 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
+            <div class="page">
                 <el-pagination
-                    background
-                    layout="total, prev, pager, next"
-                    :current-page="query.pageIndex"
-                    :page-size="query.pageSize"
-                    :total="pageTotal"
-                    @current-change="handlePageChange"
-                ></el-pagination>
+                @size-change="handlePageSize" 
+                @current-change="handlePageChange"
+                :page-sizes="[10, 20, 30, 40]"
+                :current-page="query.pageNum"
+                :page-size="query.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageTotal">
+                </el-pagination>
             </div>
         </div>
 
@@ -101,16 +102,16 @@
 
 <script>
 import { fetchData } from '../../../api/datasource/index';
-import localItem from '../../../utils/localstorage'
+import localItem from '../../../utils/localstorage' 
 
 export default {
     name: 'basetable',
     data() {
         return {
             query: {
-                userId: localItem.getLoginUser();
+                userId: localItem.getLoginUser(),
                 pageNum: 1,
-                pageSize: 15
+                pageSize: 10
             },
             tableData: [],
             multipleSelection: [],
@@ -126,11 +127,22 @@ export default {
         this.getData();
     },
     methods: {
+        //修改每页条数
+        handlePageSize(value){
+            this.query.pageSize = value
+            this.getData()
+        },
+        // 分页导航
+        handlePageChange(value) {
+            this.query.pageNum = value
+            // this.$set(this.query, 'pageIndex', value);
+            this.getData();
+        },
         // 获取 easy-mock 的模拟数据
         getData() {
             fetchData(this.query).then(res => {
                 this.tableData = res.data;
-                this.pageTotal = res.pageTotal || 0;
+                this.pageTotal = res.pageTotal || 19;
             });
         },
         //新增一个数据源
@@ -179,11 +191,6 @@ export default {
             this.editVisible = false;
             this.$message.success(`修改第 ${this.idx + 1} 行成功`);
             this.$set(this.tableData, this.idx, this.form);
-        },
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
-            this.getData();
         }
     }
 };
@@ -217,5 +224,8 @@ export default {
     margin: auto;
     width: 40px;
     height: 40px;
+}
+.page{
+    margin-top: 10px;
 }
 </style>
