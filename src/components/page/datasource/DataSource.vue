@@ -80,13 +80,6 @@
                 <el-form-item label="备注说明">
                     <el-input type="textarea" rows="5" v-model="popupWindow.form.remark"></el-input>
                 </el-form-item>
-
-                <!-- <el-form-item label="上级单位">
-                    <el-select v-model="form.pName" placeholder="无上级单位" class="handle-select mr10">
-                        <el-option v-for="(item,index) in pUnitList" :key="index" :label="item.name" :value="item.id"></el-option>
-                    </el-select>
-                </el-form-item> -->
-                
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
@@ -170,14 +163,13 @@ export default {
             this.$confirm('确定要删除吗？', '提示', {
                 type: 'warning'
             }).then(() => {
-                    unitApi.delUnitData(row.id).then(res => {
-                        if(res.code == 200){
-                            this.$message.success(res.message);
-                            this.getData();
-                        }
-                    });
-                })
-                .catch(() => {});
+                dataSourceApi.delDataSourceData(row.id).then(res => {
+                    if(res.code == 200){
+                        this.$message.success(res.message);
+                        this.getData();
+                    }
+                });
+            }).catch(() => {});
         },
         // 多选操作
         handleSelectionChange(val) {
@@ -185,7 +177,7 @@ export default {
         },
         delAllSelection() {
             if(this.multipleSelection.length > 0){
-                unitApi.delBeachUnitData(this.multipleSelection).then(res => {
+                dataSourceApi.delBeachDataSourceData(this.multipleSelection).then(res => {
                     if(res.code == 200){
                         this.$message.success(res.message);
                         this.getData();
@@ -200,19 +192,16 @@ export default {
         },
         // 编辑操作
         handleEdit(index, row) {
-            this.form={
+            this.popupWindow.form={
                 id :    row.id,
                 name:   row.name,
-                sName:  row.sName,
-                pid :   row.pid,
-                pName:  row.pName,
                 remark: row.remark,
                 creator:row.creator,
                 createTime : row.createTime
             },
-            this.title = "编辑";
-            this.operationType = '1';
-            this.editVisible = true;
+            this.popupWindow.title = "编辑";
+            this.popupWindow.operationType = '1';
+            this.popupWindow.editVisible = true;
         },
         // 保存编辑
         saveEdit() {

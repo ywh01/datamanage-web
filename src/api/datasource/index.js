@@ -11,9 +11,29 @@ export default {
     },
     insertData(insert){
         return request({
-            url: './getAllDataSource',
+            url: './dataSource/getAllDataSource',
             method: 'post',
             params: insert
+        });
+    },
+    delDataSourceData(id){
+        const arr = [];
+        arr.push(id);
+        return request({
+            url: './dataSource/delDataSourceData',
+            method: 'post',
+            data: arr
+        });
+    },
+    delBeachDataSourceData(ids){
+        const arr = [];
+        for(var i=0; i<ids.length; i++){
+            arr.push(ids[i].id);
+        }
+        return request({
+            url: './dataSource/delDataSourceData',
+            method: 'post',
+            data: arr
         });
     }
 }
